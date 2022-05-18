@@ -24,6 +24,58 @@ class CoopService {
         return response;
     }
 
+    async getCoopAddresses() {
+        const coopCount = await coopFactoryContract.methods.getCoopCount().call();
+        var coopAddresses = [];
+        var coopAddress;
+        for (var i = (parseInt(coopCount) - 1); i >= 0; i--) {
+            coopAddress = await coopFactoryContract.methods.coops(i).call();
+            coopAddresses.push(coopAddress);
+        }
+        return coopAddresses;
+    }
+
+    async getCoopDetails(coopAddress) {
+        const coopContract = this.getCoopContract(coopAddress);
+        const coopDetails = {};
+        coopDetails.name = await coopContract.methods.name().call();
+        coopDetails.symbol = await coopContract.methods.symbol().call();
+        coopDetails.coopInitiator = await coopContract.methods.coopInitiator().call();
+        coopDetails.votingPeriod = await coopContract.methods.votingPeriod().call();
+        coopDetails.gracePeriod = await coopContract.methods.gracePeriod().call();
+        coopDetails.quorum = await coopContract.methods.quorum().call();
+        coopDetails.supermajority = await coopContract.methods.supermajority().call();
+        coopDetails.status = await coopContract.methods.status().call();
+        coopDetails.created = await coopContract.methods.created().call();
+        coopDetails.membershipFee = await coopContract.methods.membershipFee().call();
+        return coopDetails;
+    }
+
+    getPeriod(seconds) {
+        var seconds = parseInt(seconds, 10);
+        var days = Math.floor(seconds / (3600*24));
+        seconds  -= days*3600*24;
+        var hrs   = Math.floor(seconds / 3600);
+        seconds  -= hrs*3600;
+        var mnts = Math.floor(seconds / 60);
+        seconds  -= mnts*60;
+        var period = ""
+        if(days !== 0) {
+            period += days+" days";
+        }
+        if(hrs !== 0) {
+            period += hrs+" hrs";
+        }
+        return period;
+    }
+
+    getCoopContract(coopAddress) {
+        return new web3.eth.Contract(
+            contractCoopABI,
+            coopAddress
+        );
+    }
+
     async sendTransaction(address, contractAddress, data, value) {
         if (!window.ethereum || address === null || address === "") {
             return {
