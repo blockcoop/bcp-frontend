@@ -3,7 +3,7 @@ const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
 const contractCoopFactoryABI = require("../../abis/coopfactory-abi.json");
-export const factoryContractAddress = "0xA8Cc9Eb159875938040A5A934a608450A1b49b17";
+export const factoryContractAddress = "0x1a07E67708BFF488b97C05D264656354db39A321";
 export const coopFactoryContract = new web3.eth.Contract(
     contractCoopFactoryABI, factoryContractAddress
 );
@@ -38,6 +38,7 @@ class CoopService {
     async getCoopDetails(coopAddress) {
         const coopContract = this.getCoopContract(coopAddress);
         const coopDetails = {};
+        coopDetails.address = coopAddress;
         coopDetails.name = await coopContract.methods.name().call();
         coopDetails.symbol = await coopContract.methods.symbol().call();
         coopDetails.coopInitiator = await coopContract.methods.coopInitiator().call();
@@ -48,7 +49,27 @@ class CoopService {
         coopDetails.status = await coopContract.methods.status().call();
         coopDetails.created = await coopContract.methods.created().call();
         coopDetails.membershipFee = await coopContract.methods.membershipFee().call();
+        coopDetails.members = await coopContract.methods.getMembers().call();
         return coopDetails;
+    }
+
+    async getMemberCoops(address) {
+        const coopAddresses = await coopFactoryContract.methods.getCoopsByMember(address).call({from: address});
+        return coopAddresses;
+    }
+
+    async joinCoop(address, coopAddress) {
+        if (!window.ethereum || address === null || address === "") {
+            return {
+                status: "💡 Connect your Metamask wallet to join COOP.",
+                code: 403
+            };
+        }
+        const coopContract = this.getCoopContract(coopAddress);
+        const value = 0;
+        const data = coopContract.methods.joinCoop().encodeABI();
+        const response = await this.sendTransaction(address, coopAddress, data, value);
+        return response;
     }
 
     getPeriod(seconds) {

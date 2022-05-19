@@ -1,8 +1,6 @@
 const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_URI;
-console.log(alchemyKey)
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
-
 class MetaMaskService {
 
     async connectWallet() {

@@ -22,3 +22,25 @@ export const createCoop = (address, name, symbol, votingPeriod, gracePeriod, quo
         }
     );
 }
+
+export const joinCoop = (address, coopAddress) => (dispatch) => {
+    return coopService.joinCoop(address, coopAddress).then(
+        (response) => {
+            let data = {
+                show: true,
+                message: "Your Join BlockCOOP request has been sent to Etherscan",
+                address: response.status,
+                code: response.code
+            }
+            dispatch({
+                type: TRANSACTION_SUBMITTED,
+                payload: data
+            });
+            return Promise.resolve(response.code);
+        },
+        (error) => {
+            console.log(error);
+            return Promise.reject();
+        }
+    );
+}

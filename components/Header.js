@@ -23,7 +23,7 @@ const Header = (props) => {
                         <a className={router.pathname == "/view-coops" ? "nav-link active" : "nav-link"}>View COOPs</a>
                     </Link>
                     <Link href="/portfolio">
-                        <a className={router.pathname == "/portfolio" ? "nav-link activer" : "nav-link"}>Portfolio</a>
+                        <a className={router.pathname == "/portfolio" ? "nav-link active" : "nav-link"}>Portfolio</a>
                     </Link>
                 </Nav>
                 <Nav id="nav-wallet">
