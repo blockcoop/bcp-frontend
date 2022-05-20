@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Dropdown, DropdownButton, Nav, Spinner, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { connect } from "react-redux";
 import { connectWallet, loadWallet } from "../redux/actions/metamask.actions";
+import metamaskService from '../redux/services/metamask.service';
 
 const Wallet = (props) => {
 
@@ -50,7 +51,7 @@ const Wallet = (props) => {
 
     useEffect( () => {
         if(props.metamask.address !== "") {
-            setShortAddress(String(props.metamask.address).substring(0, 6) + "..." + String(props.metamask.address).substring(38));
+            setShortAddress(metamaskService.getShortAddress(props.metamask.address));
         }
     }, [props.metamask])
 

@@ -3,7 +3,7 @@ const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
 const contractCoopFactoryABI = require("../../abis/coopfactory-abi.json");
-export const factoryContractAddress = "0x1a07E67708BFF488b97C05D264656354db39A321";
+export const factoryContractAddress = "0x46fc6447cF708962BFcd1D0446289F2E1D297EB3";
 export const coopFactoryContract = new web3.eth.Contract(
     contractCoopFactoryABI, factoryContractAddress
 );
@@ -68,6 +68,44 @@ class CoopService {
         const coopContract = this.getCoopContract(coopAddress);
         const value = 0;
         const data = coopContract.methods.joinCoop().encodeABI();
+        const response = await this.sendTransaction(address, coopAddress, data, value);
+        return response;
+    }
+
+    async createTask(address, coopAddress, details, votingDeadline, taskDeadline) {
+        if (!window.ethereum || address === null || address === "") {
+            return {
+                status: "💡 Connect your Metamask wallet to join COOP.",
+                code: 403
+            };
+        }
+        const coopContract = this.getCoopContract(coopAddress);
+        const value = 0;
+        const data = coopContract.methods.createTask(details, votingDeadline, taskDeadline).encodeABI();
+        const response = await this.sendTransaction(address, coopAddress, data, value);
+        return response;
+    }
+
+    async getTaskCount(coopAddress) {
+        const coopContract = this.getCoopContract(coopAddress);
+        return await coopContract.methods.getTaskCount().call();
+    }
+
+    async getTask(coopAddress, taskId) {
+        const coopContract = this.getCoopContract(coopAddress);
+        return await coopContract.methods.getTask(taskId).call();
+    }
+
+    async participate(address, coopAddress, taskId) {
+        if (!window.ethereum || address === null || address === "") {
+            return {
+                status: "💡 Connect your Metamask wallet to join COOP.",
+                code: 403
+            };
+        }
+        const coopContract = this.getCoopContract(coopAddress);
+        const value = 0;
+        const data = coopContract.methods.participate(taskId).encodeABI();
         const response = await this.sendTransaction(address, coopAddress, data, value);
         return response;
     }

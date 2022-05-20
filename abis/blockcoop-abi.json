@@ -188,9 +188,9 @@
                 "type": "uint32"
             },
             {
-                "internalType": "uint256",
+                "internalType": "uint32",
                 "name": "_taskDeadline",
-                "type": "uint256"
+                "type": "uint32"
             }
         ],
         "name": "createTask",
@@ -255,6 +255,50 @@
             {
                 "internalType": "address[]",
                 "name": "",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_taskId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getTask",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "creator",
+                "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "details",
+                "type": "string"
+            },
+            {
+                "internalType": "enum BlockCoop.TaskStatus",
+                "name": "taskStatus",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint32",
+                "name": "votingDeadline",
+                "type": "uint32"
+            },
+            {
+                "internalType": "uint32",
+                "name": "taskDeadline",
+                "type": "uint32"
+            },
+            {
+                "internalType": "address[]",
+                "name": "participants",
                 "type": "address[]"
             }
         ],

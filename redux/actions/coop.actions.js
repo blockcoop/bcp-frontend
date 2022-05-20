@@ -44,3 +44,47 @@ export const joinCoop = (address, coopAddress) => (dispatch) => {
         }
     );
 }
+
+export const createTask = (address, coopAddress, details, votingDeadline, taskDeadline) => (dispatch) => {
+    return coopService.createTask(address, coopAddress, details, votingDeadline, taskDeadline).then(
+        (response) => {
+            let data = {
+                show: true,
+                message: "Your Task creation request has been sent to Etherscan",
+                address: response.status,
+                code: response.code
+            }
+            dispatch({
+                type: TRANSACTION_SUBMITTED,
+                payload: data
+            });
+            return Promise.resolve(response.code);
+        },
+        (error) => {
+            console.log(error);
+            return Promise.reject();
+        }
+    );
+}
+
+export const participate = (address, coopAddress, taskId) => (dispatch) => {
+    return coopService.participate(address, coopAddress, taskId).then(
+        (response) => {
+            let data = {
+                show: true,
+                message: "Your participation request has been sent to Etherscan",
+                address: response.status,
+                code: response.code
+            }
+            dispatch({
+                type: TRANSACTION_SUBMITTED,
+                payload: data
+            });
+            return Promise.resolve(response.code);
+        },
+        (error) => {
+            console.log(error);
+            return Promise.reject();
+        }
+    );
+}
