@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
 import { joinCoop } from "../redux/actions/coop.actions";
+import coopService from "../redux/services/coop.service";
 
 const JoinCoop = (props) => {
     const [joining, setJoining] = useState(false)
+    const [contractListner, setContractListner] = useState([])
 
     const handleJoinCoop = () => {
         setJoining(true);
@@ -12,7 +14,6 @@ const JoinCoop = (props) => {
             joinCoop(props.metamask.address, props.coop.address)
         )
         .then((response) => {
-            console.log(response)
             if(response !== 200) {
                 setJoining(false);
             }
@@ -21,6 +22,28 @@ const JoinCoop = (props) => {
             setJoining(false);
         });
     }
+
+    useEffect(() => {
+        if(!contractListner.includes(props.metamask.address) && props.coop.address) {
+            contractListner.push(props.metamask.address)
+            setContractListner(contractListner)
+            const coopContract = coopService.getCoopContract(props.coop.address)
+            coopContract.events.CoopJoined({
+                filter: {member: props.metamask.address}
+            }, (error, data) => {
+                console.log(error)
+                console.log(data)
+                if(error) {
+                    toast.error("Problem with joining the COOP.")
+                    setJoining(false);
+                } else {
+                    toast.success("COOP joined successfully.")
+                    props.loadCoopDetails();
+                    setJoining(false);
+                }
+            });
+        }
+    }, [props.metamask.address])
 
     return <>
         {

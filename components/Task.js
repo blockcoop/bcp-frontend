@@ -70,7 +70,7 @@ const Task = (props) => {
                 <p className="fw-bold fs-6 mb-1">Participants: </p>
                 {
                     task.participants.map((participant, i) => 
-                    <EtherscanAddressLink key={i} address={participant} className="me-4" />)
+                    <span className="me-4" key={i} ><EtherscanAddressLink address={participant} /></span>)
                 }
                 <div className="actions mt-4">
                     <ul className="list-inline mb-0">

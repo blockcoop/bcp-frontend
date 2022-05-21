@@ -3,7 +3,7 @@ const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
 const contractCoopFactoryABI = require("../../abis/coopfactory-abi.json");
-export const factoryContractAddress = "0x46fc6447cF708962BFcd1D0446289F2E1D297EB3";
+export const factoryContractAddress = "0x52e08bc06526E79030D9DC3c5924fdA7b2d8d528";
 export const coopFactoryContract = new web3.eth.Contract(
     contractCoopFactoryABI, factoryContractAddress
 );
