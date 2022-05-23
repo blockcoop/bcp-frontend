@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Badge, Button, ListGroup, Spinner } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Badge, ListGroup, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
 import coopService from "../redux/services/coop.service";
 import CreateTask from "./CreateTask";
@@ -8,17 +8,23 @@ import Task from "./Task";
 const Tasks = (props) => {
     const [taskCount, setTaskCount] = useState(null)
 
-    const getTasks = useMemo(() => {
+    const loadTasks = async () => {
         coopService.getTaskCount(props.coop.address).then(count => {
             setTaskCount(Number(count))
         })
+    }
+
+    useEffect(() => {
+        if(props.coop.address) {
+            loadTasks()
+        }
     }, [props.coop.address])
 
     return <div>
         {
-            taskCount ?
+            (taskCount !== null)  ?
             <>
-                <h4 className="fw-bold mb-3">Tasks <Badge pill bg="secondary">{taskCount}</Badge> {" "}<CreateTask coop={props.coop} /></h4>
+                <h4 className="fw-bold mb-3">Tasks <Badge pill bg="secondary">{taskCount}</Badge> {" "}<CreateTask coop={props.coop} loadTasks={loadTasks} /></h4>
                 {
                     taskCount > 0 ?
                     <ListGroup>

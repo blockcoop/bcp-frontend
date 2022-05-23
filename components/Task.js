@@ -1,24 +1,63 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, ListGroup, Spinner } from "react-bootstrap";
+import { Badge, Button, ListGroup, OverlayTrigger, Popover, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
 import coopService from "../redux/services/coop.service";
 import Moment from "react-moment";
 import moment from "moment";
 import EtherscanAddressLink from "./EtherscanAddressLink";
-import { participate } from "../redux/actions/coop.actions";
+import { participate, vote } from "../redux/actions/coop.actions";
+import { toast } from "react-toastify";
+import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 
 const Task = (props) => {
 
     const [task, setTask] = useState(null)
     const [participating, setParticipating] = useState(false)
+    const [voting, setVoting] = useState(false)
+    const [contractListner, setContractListner] = useState([])
 
     let currentTime = new Date().getTime() / 1000;
 
-    useEffect(() => {
+    const getTaskDetails = async () => {
         coopService.getTask(props.coopAddress, props.taskId).then((taskDetails) => {
             setTask(taskDetails)
         })
-    }, [props.coopAddress, props.taskId])
+    }
+
+    useEffect(() => {
+        getTaskDetails()
+        if(!contractListner.includes(props.metamask.address) && props.coopAddress !== '') {
+            contractListner.push(props.metamask.address)
+            setContractListner(contractListner)
+            const coopContract = coopService.getCoopContract(props.coopAddress)
+            
+            coopContract.events.Participated({
+                filter: {participant: props.metamask.address, taskId: props.taskId}
+            }, (error, data) => {
+                if(error) {
+                    toast.error("Problem with participating in a task.")
+                    setParticipating(false);
+                } else {
+                    toast.success("Participated in a task successfully.")
+                    getTaskDetails();
+                    setParticipating(false);
+                }
+            });
+
+            coopContract.events.Voted({
+                filter: {member: props.metamask.address, taskId: props.taskId}
+            }, (error, data) => {
+                if(error) {
+                    toast.error("Problem with voting for a task.")
+                    setVoting(false);
+                } else {
+                    toast.success("Voted for a task successfully.")
+                    getTaskDetails();
+                    setVoting(false);
+                }
+            });
+        }
+    }, [props.metamask.address])
 
     const statuses = {
         0: 'Proposed',
@@ -45,6 +84,32 @@ const Task = (props) => {
         });
     }
 
+    const handleVote = (isYes) => {
+        setVoting(true)
+        props.dispatch(
+            vote(props.metamask.address, props.coopAddress, props.taskId, isYes)
+        )
+        .then((response) => {
+            console.log(response)
+            if(response !== 200) {
+                setVoting(false);
+            }
+        })
+        .catch(() => {
+            setVoting(false);
+        });
+    }
+
+    const voteComponent = (
+        <Popover id="popover-basic">
+            <Popover.Header as="h3">Vote for the Task</Popover.Header>
+            <Popover.Body className="text-center">
+                <FaThumbsUp className="text-success fs-4" title="Vote Yes" style={{cursor: 'pointer'}} onClick={() => handleVote(true)} /> {" "} &nbsp;&nbsp;
+                <FaThumbsDown className="text-danger fs-4" title="Vote No" style={{cursor: 'pointer'}} onClick={() => handleVote(false)} />
+            </Popover.Body>
+        </Popover>
+    )
+
     return <ListGroup.Item className="p-4">
         {
             task ?
@@ -60,26 +125,43 @@ const Task = (props) => {
                     </li>
                     <li className="list-inline-item me-4">
                         Voting Deadline: {" "}
-                        <b><Moment unix format="DD/MM/YYYY hh:mm:ss">{task.votingDeadline}</Moment></b>
+                        <b><Moment unix format="DD/MM/YYYY hh:mm:ss a">{task.votingDeadline}</Moment></b>
                     </li>
                     <li className="list-inline-item">
                         Task Deadline:  {" "}
-                        <b><Moment unix format="DD/MM/YYYY hh:mm:ss">{task.taskDeadline}</Moment></b>
+                        <b><Moment unix format="DD/MM/YYYY hh:mm:ss a">{task.taskDeadline}</Moment></b>
                     </li>
                 </ul>
                 <p className="fw-bold fs-6 mb-1">Participants: </p>
                 {
                     task.participants.map((participant, i) => 
-                    <span className="me-4" key={i} ><EtherscanAddressLink address={participant} /></span>)
+                    <span className="me-4" key={i} >
+                        {
+                            participant === props.metamask.address ?
+                            <a href={"https://ropsten.etherscan.io/address/"+participant} target="_blank" rel="noreferrer">
+                                You
+                            </a> :
+                            <EtherscanAddressLink address={participant} />
+                        }
+                    </span>)
                 }
                 <div className="actions mt-4">
                     <ul className="list-inline mb-0">
                     {
                         task.votingDeadline > currentTime &&
                         <li className="list-inline-item me-3">
-                            <Button>Vote</Button>
+                            {
+                                voting ?
+                                <Button disabled>Voting <Spinner animation="border" size="sm" /></Button> :
+                                <OverlayTrigger trigger="click" placement="top" overlay={voteComponent}>
+                                    <Button>Vote</Button>
+                                </OverlayTrigger>
+                            }
+                            
                         </li>
                     }
+                    {
+                        ! task.participants.includes(props.metamask.address) &&
                         <li className="list-inline-item">
                             {
                                 participating ?
@@ -87,6 +169,9 @@ const Task = (props) => {
                                 <Button onClick={handleParticipate}>Participate</Button>
                             }
                         </li>
+                    }
+
+                        
                     </ul>
                 </div>
             </> :

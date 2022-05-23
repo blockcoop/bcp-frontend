@@ -13,11 +13,15 @@ const Coop = (props) => {
 
     const [coop, setCoop] = useState(null)
 
-    const loadCoopDetails = useMemo(() => {
+    const loadCoopDetails = async () => {
+        coopService.getCoopDetails(coopAddress).then((coopDetails) => {
+            setCoop(coopDetails)
+        })
+    }
+
+    useEffect(() => {
         if(coopAddress) {
-            coopService.getCoopDetails(coopAddress).then((coopDetails) => {
-                setCoop(coopDetails)
-            })
+            loadCoopDetails();
         }
     }, [coopAddress])
 

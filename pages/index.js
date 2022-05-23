@@ -1,8 +1,10 @@
-import { useState } from "react";
+import Router from "next/router";
+import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, InputGroup, Row, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import { createCoop } from "../redux/actions/coop.actions";
+import { coopFactoryContract } from "../redux/services/coop.service";
 import { CHANGE_NETWORK_MODAL } from "../redux/types";
 
 const CreateCoop = (props) => {
@@ -17,6 +19,8 @@ const CreateCoop = (props) => {
     const [supermajority, setSupermajority] = useState(50)
     const [membershipFee, setMembershipFee] = useState(0)
     const [isCreating, setIsCreating] = useState(false)
+
+    const [contractListner, setContractListner] = useState([])
 
     const handleCreateCoop = async () => {
         if(showNetworkModal()) {
@@ -57,6 +61,26 @@ const CreateCoop = (props) => {
             return false
         }
     }
+
+    useEffect(() => {
+        if(props.metamask.address !== "" && !contractListner.includes(props.metamask.address)) {
+            contractListner.push(props.metamask.address)
+            setContractListner(contractListner)
+            coopFactoryContract.events.CoopCreated({
+                filter: {initiator: props.metamask.address}
+            }, (error, data) => {
+                if(error) {
+                    toast.error("COOP creation failed.")
+                } else {
+                    toast.success("COOP created successfully.")
+                    Router.push({
+                        pathname: '/coop/'+data.returnValues.coopAddress,
+                        query: { isNew: 1 }
+                    })
+                }
+            });
+        }
+    }, [props.metamask.address])
 
     return (
         <Container className="main-content">

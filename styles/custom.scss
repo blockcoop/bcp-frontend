@@ -37,6 +37,10 @@ a {
     margin: 0 auto;
 }
 
+.btn-primary {
+    background: linear-gradient(270deg, #FF853F 0%, #F84814 34%, #FF853F 100%) !important;
+}
+
 .btn-check:checked + .btn-primary, .btn-check:active + .btn-primary, .btn-primary:active, .btn-primary.active, .show > .btn-primary.dropdown-toggle {
     color: #FFFFFF;
     &:hover {

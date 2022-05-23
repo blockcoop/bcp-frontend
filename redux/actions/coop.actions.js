@@ -23,8 +23,8 @@ export const createCoop = (address, name, symbol, votingPeriod, gracePeriod, quo
     );
 }
 
-export const joinCoop = (address, coopAddress) => (dispatch) => {
-    return coopService.joinCoop(address, coopAddress).then(
+export const joinCoop = (address, coopAddress, membershipFee) => (dispatch) => {
+    return coopService.joinCoop(address, coopAddress, membershipFee).then(
         (response) => {
             let data = {
                 show: true,
@@ -73,6 +73,28 @@ export const participate = (address, coopAddress, taskId) => (dispatch) => {
             let data = {
                 show: true,
                 message: "Your participation request has been sent to Etherscan",
+                address: response.status,
+                code: response.code
+            }
+            dispatch({
+                type: TRANSACTION_SUBMITTED,
+                payload: data
+            });
+            return Promise.resolve(response.code);
+        },
+        (error) => {
+            console.log(error);
+            return Promise.reject();
+        }
+    );
+}
+
+export const vote = (address, coopAddress, taskId, isYes) => (dispatch) => {
+    return coopService.vote(address, coopAddress, taskId, isYes).then(
+        (response) => {
+            let data = {
+                show: true,
+                message: "Your vote has been sent to Etherscan",
                 address: response.status,
                 code: response.code
             }

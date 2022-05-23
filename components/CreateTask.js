@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Col, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import { createTask } from "../redux/actions/coop.actions";
+import coopService from "../redux/services/coop.service";
 
 const CreateTask = (props) => {
     const [show, setShow] = useState(false)
@@ -10,6 +11,7 @@ const CreateTask = (props) => {
     const [taskDeadline, setTaskDeadline] = useState("")
     const [votingDeadline, setVotingDeadline] = useState("")
     const [isCreating, setIsCreating] = useState(false)
+    const [contractListner, setContractListner] = useState([])
 
     const handleCreateTask = () => {
         if(details === '' || taskDeadline === '' || votingDeadline === '') {
@@ -49,6 +51,28 @@ const CreateTask = (props) => {
             setShow(false)
         });
     }
+
+    useEffect(() => {
+        if(!contractListner.includes(props.metamask.address) && props.coop.address !== '') {
+            contractListner.push(props.metamask.address)
+            setContractListner(contractListner)
+            const coopContract = coopService.getCoopContract(props.coop.address)
+            coopContract.events.TaskCreated({
+                filter: {creator: props.metamask.address}
+            }, (error, data) => {
+                if(error) {
+                    toast.error("Problem with creating a task.")
+                    setIsCreating(false);
+                    setShow(false)
+                } else {
+                    toast.success("Task created successfully.")
+                    props.loadTasks();
+                    setIsCreating(false);
+                    setShow(false)
+                }
+            });
+        }
+    }, [props.metamask.address])
 
     return (<>
         <Button variant="primary" onClick={() => setShow(true)}>

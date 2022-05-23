@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
+import { toast } from "react-toastify";
 import { joinCoop } from "../redux/actions/coop.actions";
 import coopService from "../redux/services/coop.service";
 
@@ -11,7 +12,7 @@ const JoinCoop = (props) => {
     const handleJoinCoop = () => {
         setJoining(true);
         props.dispatch(
-            joinCoop(props.metamask.address, props.coop.address)
+            joinCoop(props.metamask.address, props.coop.address, props.coop.membershipFee)
         )
         .then((response) => {
             if(response !== 200) {
@@ -31,8 +32,6 @@ const JoinCoop = (props) => {
             coopContract.events.CoopJoined({
                 filter: {member: props.metamask.address}
             }, (error, data) => {
-                console.log(error)
-                console.log(data)
                 if(error) {
                     toast.error("Problem with joining the COOP.")
                     setJoining(false);

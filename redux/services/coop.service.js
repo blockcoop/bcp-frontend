@@ -19,7 +19,8 @@ class CoopService {
             };
         }
         const value = 0;
-        const data = coopFactoryContract.methods.createCoop(name, symbol, votingPeriod, gracePeriod, quorum, supermajority, membershipFee).encodeABI();
+        const fee = (membershipFee > 0) ? web3.utils.toWei((membershipFee).toString(), 'ether') : 0;
+        const data = coopFactoryContract.methods.createCoop(name, symbol, votingPeriod, gracePeriod, quorum, supermajority, fee).encodeABI();
         const response = await this.sendTransaction(address, factoryContractAddress, data, value);
         return response;
     }
@@ -49,6 +50,9 @@ class CoopService {
         coopDetails.status = await coopContract.methods.status().call();
         coopDetails.created = await coopContract.methods.created().call();
         coopDetails.membershipFee = await coopContract.methods.membershipFee().call();
+        if(coopDetails.membershipFee > 0) {
+            coopDetails.membershipFee = web3.utils.fromWei(coopDetails.membershipFee);
+        }
         coopDetails.members = await coopContract.methods.getMembers().call();
         return coopDetails;
     }
@@ -58,7 +62,7 @@ class CoopService {
         return coopAddresses;
     }
 
-    async joinCoop(address, coopAddress) {
+    async joinCoop(address, coopAddress, membershipFee) {
         if (!window.ethereum || address === null || address === "") {
             return {
                 status: "💡 Connect your Metamask wallet to join COOP.",
@@ -66,7 +70,7 @@ class CoopService {
             };
         }
         const coopContract = this.getCoopContract(coopAddress);
-        const value = 0;
+        const value = (membershipFee > 0) ? parseInt(web3.utils.toWei((membershipFee).toString(), 'ether')).toString(16) : 0;
         const data = coopContract.methods.joinCoop().encodeABI();
         const response = await this.sendTransaction(address, coopAddress, data, value);
         return response;
@@ -75,7 +79,7 @@ class CoopService {
     async createTask(address, coopAddress, details, votingDeadline, taskDeadline) {
         if (!window.ethereum || address === null || address === "") {
             return {
-                status: "💡 Connect your Metamask wallet to join COOP.",
+                status: "💡 Connect your Metamask wallet to create task.",
                 code: 403
             };
         }
@@ -99,13 +103,27 @@ class CoopService {
     async participate(address, coopAddress, taskId) {
         if (!window.ethereum || address === null || address === "") {
             return {
-                status: "💡 Connect your Metamask wallet to join COOP.",
+                status: "💡 Connect your Metamask wallet to join participate.",
                 code: 403
             };
         }
         const coopContract = this.getCoopContract(coopAddress);
         const value = 0;
         const data = coopContract.methods.participate(taskId).encodeABI();
+        const response = await this.sendTransaction(address, coopAddress, data, value);
+        return response;
+    }
+
+    async vote(address, coopAddress, taskId, isYes) {
+        if (!window.ethereum || address === null || address === "") {
+            return {
+                status: "💡 Connect your Metamask wallet to Vote.",
+                code: 403
+            };
+        }
+        const coopContract = this.getCoopContract(coopAddress);
+        const value = 0;
+        const data = coopContract.methods.vote(taskId, isYes).encodeABI();
         const response = await this.sendTransaction(address, coopAddress, data, value);
         return response;
     }
