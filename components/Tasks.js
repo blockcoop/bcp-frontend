@@ -28,7 +28,7 @@ const Tasks = (props) => {
                 {
                     taskCount > 0 ?
                     <ListGroup>
-                        { Array.from(Array((taskCount+1)).keys()).slice(1).map(value => <Task key={value} coopAddress={props.coop.address} taskId={value} />) }
+                        { Array.from(Array((taskCount+1)).keys()).slice(1).reverse().map(value => <Task key={value} coopAddress={props.coop.address} taskId={value} />) }
                     </ListGroup> :
                     <h5>No Tasks</h5>
                 }

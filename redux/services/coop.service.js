@@ -128,6 +128,34 @@ class CoopService {
         return response;
     }
 
+    async processTaskVoting(address, coopAddress, taskId) {
+        if (!window.ethereum || address === null || address === "") {
+            return {
+                status: "💡 Connect your Metamask wallet to process voting.",
+                code: 403
+            };
+        }
+        const coopContract = this.getCoopContract(coopAddress);
+        const value = 0;
+        const data = coopContract.methods.processTaskVoting(taskId).encodeABI();
+        const response = await this.sendTransaction(address, coopAddress, data, value);
+        return response;
+    }
+
+    async processTaskCompletion(address, coopAddress, taskId, isCompleted) {
+        if (!window.ethereum || address === null || address === "") {
+            return {
+                status: "💡 Connect your Metamask wallet to process task completion.",
+                code: 403
+            };
+        }
+        const coopContract = this.getCoopContract(coopAddress);
+        const value = 0;
+        const data = coopContract.methods.processTaskCompletion(taskId, isCompleted).encodeABI();
+        const response = await this.sendTransaction(address, coopAddress, data, value);
+        return response;
+    }
+
     getPeriod(seconds) {
         var seconds = parseInt(seconds, 10);
         var days = Math.floor(seconds / (3600*24));

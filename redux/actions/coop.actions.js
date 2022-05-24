@@ -110,3 +110,47 @@ export const vote = (address, coopAddress, taskId, isYes) => (dispatch) => {
         }
     );
 }
+
+export const processTaskVoting = (address, coopAddress, taskId) => (dispatch) => {
+    return coopService.processTaskVoting(address, coopAddress, taskId).then(
+        (response) => {
+            let data = {
+                show: true,
+                message: "Your process voting request has been sent to Etherscan",
+                address: response.status,
+                code: response.code
+            }
+            dispatch({
+                type: TRANSACTION_SUBMITTED,
+                payload: data
+            });
+            return Promise.resolve(response.code);
+        },
+        (error) => {
+            console.log(error);
+            return Promise.reject();
+        }
+    );
+}
+
+export const processTaskCompletion = (address, coopAddress, taskId, isCompleted) => (dispatch) => {
+    return coopService.processTaskCompletion(address, coopAddress, taskId, isCompleted).then(
+        (response) => {
+            let data = {
+                show: true,
+                message: "Your process task request has been sent to Etherscan",
+                address: response.status,
+                code: response.code
+            }
+            dispatch({
+                type: TRANSACTION_SUBMITTED,
+                payload: data
+            });
+            return Promise.resolve(response.code);
+        },
+        (error) => {
+            console.log(error);
+            return Promise.reject();
+        }
+    );
+}
