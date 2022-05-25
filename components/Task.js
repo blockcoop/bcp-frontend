@@ -8,6 +8,7 @@ import EtherscanAddressLink from "./EtherscanAddressLink";
 import { participate, processTaskCompletion, processTaskVoting, vote } from "../redux/actions/coop.actions";
 import { toast } from "react-toastify";
 import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
+import { CHANGE_NETWORK_MODAL } from "../redux/types";
 
 const Task = (props) => {
 
@@ -108,6 +109,9 @@ const Task = (props) => {
     }
 
     const handleParticipate = () => {
+        if(showNetworkModal()) {
+            return;
+        }
         setParticipating(true)
         props.dispatch(
             participate(props.metamask.address, props.coopAddress, props.taskId)
@@ -124,6 +128,9 @@ const Task = (props) => {
     }
 
     const handleVote = (isYes) => {
+        if(showNetworkModal()) {
+            return;
+        }
         setVoting(true)
         props.dispatch(
             vote(props.metamask.address, props.coopAddress, props.taskId, isYes)
@@ -140,6 +147,9 @@ const Task = (props) => {
     }
 
     const handleProcessVoting = () => {
+        if(showNetworkModal()) {
+            return;
+        }
         setProcessVoting(true)
         props.dispatch(
             processTaskVoting(props.metamask.address, props.coopAddress, props.taskId)
@@ -156,6 +166,9 @@ const Task = (props) => {
     }
 
     const handleProcessTask = (isCompleted) => {
+        if(showNetworkModal()) {
+            return;
+        }
         setProcessTask(true)
         props.dispatch(
             processTaskCompletion(props.metamask.address, props.coopAddress, props.taskId, isCompleted)
@@ -190,6 +203,18 @@ const Task = (props) => {
             </Popover.Body>
         </Popover>
     )
+
+    const showNetworkModal = () => {
+        if(props.metamask.address === "" || props.metamask.chainId !== '0x3') {
+            props.dispatch({
+                type: CHANGE_NETWORK_MODAL,
+                payload: {showModal: true}
+            });
+            return true;
+        } else {
+            return false
+        }
+    }
 
     return <ListGroup.Item className="p-4">
         {

@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import { createTask } from "../redux/actions/coop.actions";
 import coopService from "../redux/services/coop.service";
+import { CHANGE_NETWORK_MODAL } from "../redux/types";
 
 const CreateTask = (props) => {
     const [show, setShow] = useState(false)
@@ -14,6 +15,9 @@ const CreateTask = (props) => {
     const [contractListner, setContractListner] = useState([])
 
     const handleCreateTask = () => {
+        if(showNetworkModal()) {
+            return;
+        }
         if(details === '' || taskDeadline === '' || votingDeadline === '') {
             toast.error("All fields compulsory", {
                 position: toast.POSITION.BOTTOM_CENTER
@@ -50,6 +54,18 @@ const CreateTask = (props) => {
             setIsCreating(false);
             setShow(false)
         });
+    }
+
+    const showNetworkModal = () => {
+        if(props.metamask.address === "" || props.metamask.chainId !== '0x3') {
+            props.dispatch({
+                type: CHANGE_NETWORK_MODAL,
+                payload: {showModal: true}
+            });
+            return true;
+        } else {
+            return false
+        }
     }
 
     useEffect(() => {

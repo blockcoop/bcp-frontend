@@ -4,12 +4,16 @@ import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import { joinCoop } from "../redux/actions/coop.actions";
 import coopService from "../redux/services/coop.service";
+import { CHANGE_NETWORK_MODAL } from "../redux/types";
 
 const JoinCoop = (props) => {
     const [joining, setJoining] = useState(false)
     const [contractListner, setContractListner] = useState([])
 
     const handleJoinCoop = () => {
+        if(showNetworkModal()) {
+            return;
+        }
         setJoining(true);
         props.dispatch(
             joinCoop(props.metamask.address, props.coop.address, props.coop.membershipFee)
@@ -22,6 +26,18 @@ const JoinCoop = (props) => {
         .catch(() => {
             setJoining(false);
         });
+    }
+
+    const showNetworkModal = () => {
+        if(props.metamask.address === "" || props.metamask.chainId !== '0x3') {
+            props.dispatch({
+                type: CHANGE_NETWORK_MODAL,
+                payload: {showModal: true}
+            });
+            return true;
+        } else {
+            return false
+        }
     }
 
     useEffect(() => {
