@@ -2,8 +2,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@200;400;700&family=Heebo:wght@400;700&display=swap');
 $primary: #F44336;
 $input-border-radius: 1.5rem;
-$btn-border-radius: 4rem;
+$btn-border-radius: 2rem;
 $btn-border-radius-lg: 4rem;
+$btn-border-radius-sm: 1rem;
 $border-radius: 0.5rem;
 @import "~bootstrap/scss/bootstrap";
 

@@ -4,7 +4,7 @@ import { Button, Col, Container, Form, InputGroup, Row, Spinner } from "react-bo
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import { createCoop } from "../redux/actions/coop.actions";
-import { coopFactoryContract } from "../redux/services/coop.service";
+import { factoryContract } from "../redux/services/coop.service";
 import { CHANGE_NETWORK_MODAL } from "../redux/types";
 
 const CreateCoop = (props) => {
@@ -37,7 +37,7 @@ const CreateCoop = (props) => {
         setIsCreating(true)
 
         props.dispatch(
-            createCoop(props.metamask.address, name, symbol, votingPeriod*votingPeriodDuration, gracePeriod*gracePeriodDuration, quorum, supermajority, membershipFee)
+            createCoop(props.metamask.address, name, symbol, votingPeriod*votingPeriodDuration, quorum, supermajority, membershipFee)
         )
         .then((response) => {
             console.log(response)
@@ -66,7 +66,7 @@ const CreateCoop = (props) => {
         if(props.metamask.address !== "" && !contractListner.includes(props.metamask.address)) {
             contractListner.push(props.metamask.address)
             setContractListner(contractListner)
-            coopFactoryContract.events.CoopCreated({
+            factoryContract.events.CoopCreated({
                 filter: {initiator: props.metamask.address}
             }, (error, data) => {
                 if(error) {
@@ -115,7 +115,7 @@ const CreateCoop = (props) => {
                         </Form.Group>
                     </Col>
                     <Col sm="6">
-                        <Form.Group controlId="grace-period">
+                        {/* <Form.Group controlId="grace-period">
                             <Form.Label>Grace Period</Form.Label>
                             <InputGroup className="mb-3">
                                 <Form.Select value={gracePeriod} onChange={ (e) => setGracePeriod(e.target.value) }>
@@ -126,7 +126,7 @@ const CreateCoop = (props) => {
                                     <option value={86400}>Days</option>
                                 </Form.Select>
                             </InputGroup>
-                        </Form.Group>
+                        </Form.Group> */}
                     </Col>
                 </Row>
                 <Row className="mb-3">

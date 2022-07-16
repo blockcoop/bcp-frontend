@@ -2,16 +2,16 @@ const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_URI;
 const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
-const contractCoopFactoryABI = require("../../abis/coopfactory-abi.json");
-export const factoryContractAddress = "0x52e08bc06526E79030D9DC3c5924fdA7b2d8d528";
-export const coopFactoryContract = new web3.eth.Contract(
-    contractCoopFactoryABI, factoryContractAddress
+const contractFactoryABI = require("../../abis/factory-abi.json");
+export const factoryContractAddress = "0x662ab6Fc87cc28bD631Ac8BDad0E6eFe0208b4f9";
+export const factoryContract = new web3.eth.Contract(
+    contractFactoryABI, factoryContractAddress
 );
 
-const contractCoopABI = require("../../abis/blockcoop-abi.json");
+const contractCoopABI = require("../../abis/coop-abi.json");
 
 class CoopService {
-    async createCOOP(address, name, symbol, votingPeriod, gracePeriod, quorum, supermajority, membershipFee) {
+    async createCOOP(address, name, symbol, votingPeriod, quorum, supermajority, membershipFee) {
         if (!window.ethereum || address === null || address === "") {
             return {
                 status: "💡 Connect your Metamask wallet to create COOP.",
@@ -20,17 +20,17 @@ class CoopService {
         }
         const value = 0;
         const fee = (membershipFee > 0) ? web3.utils.toWei((membershipFee).toString(), 'ether') : 0;
-        const data = coopFactoryContract.methods.createCoop(name, symbol, votingPeriod, gracePeriod, quorum, supermajority, fee).encodeABI();
+        const data = factoryContract.methods.createCoop(name, symbol, votingPeriod, quorum, supermajority, fee).encodeABI();
         const response = await this.sendTransaction(address, factoryContractAddress, data, value);
         return response;
     }
 
     async getCoopAddresses() {
-        const coopCount = await coopFactoryContract.methods.getCoopCount().call();
+        const coopCount = await factoryContract.methods.getCoopCount().call();
         var coopAddresses = [];
         var coopAddress;
         for (var i = (parseInt(coopCount) - 1); i >= 0; i--) {
-            coopAddress = await coopFactoryContract.methods.coops(i).call();
+            coopAddress = await factoryContract.methods.coops(i).call();
             coopAddresses.push(coopAddress);
         }
         return coopAddresses;
@@ -44,7 +44,7 @@ class CoopService {
         coopDetails.symbol = await coopContract.methods.symbol().call();
         coopDetails.coopInitiator = await coopContract.methods.coopInitiator().call();
         coopDetails.votingPeriod = await coopContract.methods.votingPeriod().call();
-        coopDetails.gracePeriod = await coopContract.methods.gracePeriod().call();
+        // coopDetails.gracePeriod = await coopContract.methods.gracePeriod().call();
         coopDetails.quorum = await coopContract.methods.quorum().call();
         coopDetails.supermajority = await coopContract.methods.supermajority().call();
         coopDetails.status = await coopContract.methods.status().call();
@@ -53,16 +53,63 @@ class CoopService {
         if(coopDetails.membershipFee > 0) {
             coopDetails.membershipFee = web3.utils.fromWei(coopDetails.membershipFee);
         }
-        coopDetails.members = await coopContract.methods.getMembers().call();
+        // coopDetails.members = await coopContract.methods.getMembers().call();
+        coopDetails.members = [];
         return coopDetails;
     }
 
+    async getGroups(coopAddress, checkMember=false, address=null) {
+        const coopContract = this.getCoopContract(coopAddress);
+        const count = await coopContract.methods.getGroupCount().call();
+        let groups = []
+        for(let i=1; i<=count; i++) {
+            let name = await coopContract.methods.getGroupNameById(i).call();
+            let size = await coopContract.methods.getMemberCount(i).call();
+            let memberFound = false;
+            if(checkMember && address) {
+                let isMember = false;
+                if(!memberFound) {
+                    isMember = await coopContract.methods.isGroupMember(address, i).call();
+                }
+                
+                groups.push({
+                    id: i,
+                    name: name,
+                    size: parseInt(size),
+                    isMember: isMember
+                })
+            } else {
+                groups.push({
+                    id: i,
+                    name: name,
+                    size: parseInt(size)
+                })
+            }
+        }
+        console.log(groups);
+        return groups;
+    }
+
+    async createGroup(address, coopAddress, name) {
+        if (!window.ethereum || address === null || address === "") {
+            return {
+                status: "💡 Connect your Metamask wallet to create group.",
+                code: 403
+            };
+        }
+        const coopContract = this.getCoopContract(coopAddress);
+        const value = 0;
+        const data = coopContract.methods.createGroup(name).encodeABI();
+        const response = await this.sendTransaction(address, coopAddress, data, value);
+        return response;
+    }
+
     async getMemberCoops(address) {
-        const coopAddresses = await coopFactoryContract.methods.getCoopsByMember(address).call({from: address});
+        const coopAddresses = await factoryContract.methods.getCoopsByMember(address).call({from: address});
         return coopAddresses;
     }
 
-    async joinCoop(address, coopAddress, membershipFee) {
+    async joinCoop(address, coopAddress, groupId, membershipFee) {
         if (!window.ethereum || address === null || address === "") {
             return {
                 status: "💡 Connect your Metamask wallet to join COOP.",
@@ -71,7 +118,7 @@ class CoopService {
         }
         const coopContract = this.getCoopContract(coopAddress);
         const value = (membershipFee > 0) ? parseInt(web3.utils.toWei((membershipFee).toString(), 'ether')).toString(16) : 0;
-        const data = coopContract.methods.joinCoop().encodeABI();
+        const data = coopContract.methods.joinCoop(groupId).encodeABI();
         const response = await this.sendTransaction(address, coopAddress, data, value);
         return response;
     }

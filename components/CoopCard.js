@@ -35,10 +35,6 @@ const CoopCard = (props) => {
                             <span className="fw-bold">{coopService.getPeriod(coop.votingPeriod)}</span>
                         </li>
                         <li>
-                            <span>Grace Period</span>
-                            <span className="fw-bold">{coopService.getPeriod(coop.gracePeriod)}</span>
-                        </li>
-                        <li>
                             <span>Membership Fee</span>
                             <span className="fw-bold">{coop.membershipFee} ETH</span>
                         </li>

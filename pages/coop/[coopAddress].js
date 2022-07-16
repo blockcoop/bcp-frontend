@@ -3,18 +3,20 @@ import { useEffect, useState, useMemo } from "react";
 import { Badge, Card, Col, Container, ListGroup, Placeholder, Row } from "react-bootstrap";
 import { FaExternalLinkAlt } from "react-icons/fa";
 import { connect } from "react-redux";
-import JoinCoop from "../../components/JoinCoop";
-import Tasks from "../../components/Tasks";
+import Groups from "../../components/groups/Groups";
+import Tasks from "../../components/tasks/Tasks";
 import coopService from "../../redux/services/coop.service";
 
-const Coop = (props) => {
+const Coop = () => {
     const router = useRouter()
     const { coopAddress } = router.query
 
     const [coop, setCoop] = useState(null)
+    const [groupId, setGroupId] = useState(0)
+    const [groups, setGroups] = useState(null)
 
     const loadCoopDetails = async () => {
-        coopService.getCoopDetails(coopAddress).then((coopDetails) => {
+        coopService.getCoopDetails(coopAddress).then(async (coopDetails) => {
             setCoop(coopDetails)
         })
     }
@@ -48,10 +50,6 @@ const Coop = (props) => {
                                 <span className="fw-bold">{coopService.getPeriod(coop.votingPeriod)}</span>
                             </li>
                             <li>
-                                <span>Grace Period</span>
-                                <span className="fw-bold">{coopService.getPeriod(coop.gracePeriod)}</span>
-                            </li>
-                            <li>
                                 <span>Quorum</span>
                                 <span className="fw-bold">{coop.quorum}%</span>
                             </li>
@@ -66,24 +64,12 @@ const Coop = (props) => {
                         </ul>
                     </Col>
                     <Col sm="6">
-                        <h4 className="fw-bold mb-3">Members <Badge pill bg="secondary">{coop.members.length}</Badge></h4>
-                        <ul className="list-unstyled list-details">
-                            {
-                                coop.members.map((member, i) => {
-                                    return (<li key={i}>
-                                    <a href={`https://ropsten.etherscan.io/address/${member}`} target="_blank" rel="noreferrer">{member}</a>
-                                </li>)
-                                })
-                            }
-                            
-                        </ul>
+                        <Groups coopAddress={coopAddress} setGroupId={setGroupId} setGroups={setGroups} coopInitiator={coop.coopInitiator} coopMembershipFee={coop.membershipFee}/>
                     </Col>
                 </Row>
                 {
-                    coop.members.includes(props.metamask.address) ?
-                    <Tasks coop={coop} /> :
-                    <JoinCoop coop={coop} loadCoopDetails={loadCoopDetails} />
-
+                    groupId !== 0 &&
+                    <Tasks coopAddress={coopAddress} groupId={groupId} groups={groups} />
                 }
             </> :
             <>
@@ -109,17 +95,7 @@ const Coop = (props) => {
                         </Placeholder>
                     </Col>
                     <Col sm="6">
-                        {/* <h4 className="fw-bold mb-3">Members <Badge pill bg="secondary">{coop.members.length}</Badge></h4>
-                        <ul className="list-unstyled list-details">
-                            {
-                                coop.members.map((member, i) => {
-                                    return (<li key={i}>
-                                    <a href={`https://ropsten.etherscan.io/address/${member}`} target="_blank" rel="noreferrer">{member}</a>
-                                </li>)
-                                })
-                            }
-                            
-                        </ul> */}
+                        
                     </Col>
                 </Row>
             </>
