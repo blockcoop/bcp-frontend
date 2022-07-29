@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { connect } from "react-redux";
-import CoopCard from "../components/CoopCard";
+import CoopNFTCard from "../components/coop/CoopNFTCard";
 import Wallet from "../components/Wallet"
 import coopService from "../redux/services/coop.service";
 
@@ -36,7 +36,7 @@ const Portfolio = (props) => {
                         <Row className="mt-5 view-coops">
                             { coops.map(function(coopAddress, i) {
                                 return <Col xl="3" lg="4" md="6" key={i}>
-                                    <CoopCard coopAddress={coopAddress} />
+                                    <CoopNFTCard coopAddress={coopAddress} />
                                 </Col>
                             }) }
                         </Row> :

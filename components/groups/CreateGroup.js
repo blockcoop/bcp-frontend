@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Button, Form, Modal, Row, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
-import { createGroup } from "../../redux/actions/coop.actions";
-import coopService from "../../redux/services/coop.service";
+import { createGroup } from "../../redux/actions/groups.actions";
+import groupsService, { groupsContract } from "../../redux/services/groups.service";
 import { CHANGE_NETWORK_MODAL } from "../../redux/types";
 
 const CreateGroup = (props) => {
@@ -55,8 +55,7 @@ const CreateGroup = (props) => {
         if(!contractListner.includes(props.metamask.address) && props.coopAddress !== '') {
             contractListner.push(props.metamask.address)
             setContractListner(contractListner)
-            const coopContract = coopService.getCoopContract(props.coopAddress)
-            coopContract.events.GroupCreated({
+            groupsContract.events.GroupCreated({
                 filter: {groupName: name}
             }, (error, data) => {
                 if(error) {

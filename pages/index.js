@@ -1,3 +1,4 @@
+import axios from "axios";
 import Router from "next/router";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Form, InputGroup, Row, Spinner } from "react-bootstrap";
@@ -19,6 +20,11 @@ const CreateCoop = (props) => {
     const [supermajority, setSupermajority] = useState(50)
     const [membershipFee, setMembershipFee] = useState(0)
     const [isCreating, setIsCreating] = useState(false)
+    const [countries, setCountries] = useState([])
+    const [country, setCountry] = useState("")
+    const [register, setRegister] = useState(null)
+    const [tnc, setTnc] = useState(false)
+    const [disclaimer, setDisclaimer] = useState(false)
 
     const [contractListner, setContractListner] = useState([])
 
@@ -34,10 +40,38 @@ const CreateCoop = (props) => {
             return;
         }
 
+        if(register == null) {
+            toast.error("Please choose whether you want to register your BlockCOOP", {
+                position: toast.POSITION.BOTTOM_CENTER
+            })
+            return;
+        }
+
+        if(register == true && country == '') {
+            toast.error("Please choose country where you want to register your BlockCOOP", {
+                position: toast.POSITION.BOTTOM_CENTER
+            })
+            return;
+        }
+
+        if(!tnc) {
+            toast.error("You need to accept TnC", {
+                position: toast.POSITION.BOTTOM_CENTER
+            })
+            return;
+        }
+
+        if(!disclaimer) {
+            toast.error("You need to accept disclaimer", {
+                position: toast.POSITION.BOTTOM_CENTER
+            })
+            return;
+        }
+
         setIsCreating(true)
 
         props.dispatch(
-            createCoop(props.metamask.address, name, symbol, votingPeriod*votingPeriodDuration, quorum, supermajority, membershipFee)
+            createCoop(props.metamask.address, name, symbol, votingPeriod*votingPeriodDuration, quorum, supermajority, membershipFee, country)
         )
         .then((response) => {
             console.log(response)
@@ -49,6 +83,36 @@ const CreateCoop = (props) => {
             setIsCreating(false);
         });
     }
+
+    const loadCountries = () => {
+        axios.get('https://restcountries.com/v3.1/all?fields=name')
+        .then(function (response) {
+            if(response.status == 200) {
+                var result = response.data.map(country => country.name.common);
+            }
+            setCountries(result.sort());
+        })
+        .catch(function (error) {
+            // handle error
+            console.log(error);
+        });
+    }
+
+    const handleRegisterChange = (event) => {
+        if(event.target.value == "register") {
+            setRegister(true);
+        } else {
+            setRegister(false);
+        }
+    }
+
+    useEffect(() => {
+        if(register) {
+            if(countries.length == 0) {
+                loadCountries();
+            }
+        }
+    }, [register, countries.length])
 
     const showNetworkModal = () => {
         if(props.metamask.address === "" || props.metamask.chainId !== '0x3') {
@@ -79,6 +143,7 @@ const CreateCoop = (props) => {
                     })
                 }
             });
+            
         }
     }, [props.metamask.address])
 
@@ -100,7 +165,7 @@ const CreateCoop = (props) => {
                     </Col>
                 </Row>
                 <Row className="mb-3">
-                    <Col sm="6">
+                    <Col sm="5">
                         <Form.Group controlId="voting-period">
                             <Form.Label>Voting Period</Form.Label>
                             <InputGroup className="mb-3">
@@ -114,7 +179,31 @@ const CreateCoop = (props) => {
                             </InputGroup>
                         </Form.Group>
                     </Col>
-                    <Col sm="6">
+                    <Col sm="7">
+                        <Row>
+                            <Col sm="6">
+                                <Form.Group controlId="quorum">
+                                    <Form.Label>Quorum</Form.Label>
+                                    <InputGroup className="mb-3">
+                                        <Form.Select value={quorum} onChange={ (e) => setQuorum(e.target.value) }>
+                                            { Array.from(Array(11).keys()).slice(1).map(value => <option key={value} value={(value*10)}>{(value*10)}</option>) }
+                                        </Form.Select>
+                                        <InputGroup.Text>%</InputGroup.Text>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Col>
+                            <Col sm="6">
+                                <Form.Group controlId="quorum">
+                                    <Form.Label>Supermajority</Form.Label>
+                                    <InputGroup className="mb-3">
+                                        <Form.Select value={supermajority} onChange={ (e) => setSupermajority(e.target.value) }>
+                                            { Array.from(Array(11).keys()).slice(1).map(value => <option key={value} value={(value*10)}>{(value*10)}</option>) }
+                                        </Form.Select>
+                                        <InputGroup.Text>%</InputGroup.Text>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Col>
+                        </Row>
                         {/* <Form.Group controlId="grace-period">
                             <Form.Label>Grace Period</Form.Label>
                             <InputGroup className="mb-3">
@@ -132,28 +221,6 @@ const CreateCoop = (props) => {
                 <Row className="mb-3">
                     <Col sm="4">
                         <Form.Group controlId="quorum">
-                            <Form.Label>Quorum</Form.Label>
-                            <InputGroup className="mb-3">
-                                <Form.Select value={quorum} onChange={ (e) => setQuorum(e.target.value) }>
-                                    { Array.from(Array(11).keys()).slice(1).map(value => <option key={value} value={(value*10)}>{(value*10)}</option>) }
-                                </Form.Select>
-                                <InputGroup.Text>%</InputGroup.Text>
-                            </InputGroup>
-                        </Form.Group>
-                    </Col>
-                    <Col sm="4">
-                        <Form.Group controlId="quorum">
-                            <Form.Label>Supermajority</Form.Label>
-                            <InputGroup className="mb-3">
-                                <Form.Select value={supermajority} onChange={ (e) => setSupermajority(e.target.value) }>
-                                    { Array.from(Array(11).keys()).slice(1).map(value => <option key={value} value={(value*10)}>{(value*10)}</option>) }
-                                </Form.Select>
-                                <InputGroup.Text>%</InputGroup.Text>
-                            </InputGroup>
-                        </Form.Group>
-                    </Col>
-                    <Col sm="4">
-                        <Form.Group controlId="quorum">
                             <Form.Label>Membership Fee</Form.Label>
                             <InputGroup className="mb-3">
                                 <Form.Control type="number" step={0.1} min={0} placeholder="Fee" value={membershipFee} onChange={(e) => setMembershipFee(e.target.value)} />
@@ -162,6 +229,43 @@ const CreateCoop = (props) => {
                         </Form.Group>
                     </Col>
                 </Row>
+                <Row className="mb-3" onChange={handleRegisterChange}>
+                    <Col sm="6">
+                        <Form.Check 
+                            type="radio"
+                            id="radio-register"
+                            label="I would like to register"
+                            name="register-radio"
+                            value="register"
+                        />
+                    </Col>
+                    <Col sm="6">
+                        <Form.Check 
+                            type="radio"
+                            id="radio-register-later"
+                            label="I'll do it later"
+                            name="register-radio"
+                            value="later"
+                        />
+                    </Col>
+                </Row>
+                {
+                    register &&
+                    <Row className="mb-3">
+                        <Col sm="6">
+                            <Form.Select value={country} onChange={ (e) => setCountry(e.target.value) }>
+                                <option value="">Select Country</option>
+                                {countries.map(country => <option key={country} value={country}>{country}</option>)}
+                            </Form.Select>
+                        </Col>
+                    </Row>
+                }
+                <Form.Group className="mb-3" controlId="tnc">
+                    <Form.Check type="checkbox" label="I understand that I need to comply with the legal regulations in my jurisdiction of operations" onChange={ (e) => setTnc(!tnc) } />
+                </Form.Group>
+                <Form.Group className="mb-3" controlId="disclaimer">
+                    <Form.Check type="checkbox" label="I understand that this is an alpha version and there is risk involved." onChange={ (e) => setDisclaimer(!disclaimer) } />
+                </Form.Group>
                 <div className="text-center mt-5">
                     {
                         isCreating ? 

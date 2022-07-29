@@ -3,24 +3,29 @@ import { Badge, ListGroup, Spinner } from "react-bootstrap";
 import Moment from "react-moment";
 import { connect } from "react-redux";
 import tasksService from "../../redux/services/tasks.service";
-import { CHANGE_NETWORK_MODAL } from "../../redux/types";
 import EtherscanAddressLink from "../EtherscanAddressLink";
 import TaskActions from "./TaskActions";
 
 const Task = (props) => {
     const [task, setTask] = useState(null)
+    const [taskGroup, setGroup] = useState(null)
 
     const getTaskDetails = useCallback( async () => {
         tasksService.getTask(props.taskId).then((taskDetails) => {
-            props.groups.forEach(group => {
-                if(group.id == taskDetails.groupId) {
-                    taskDetails['group'] = group.name;
-                }
-            });
             setTask(taskDetails)
 
         })
     }, [props.taskId])
+
+    useEffect(() => {
+        if(props.groups !== null && task !== null) {
+            props.groups.forEach(group => {
+                if(group.id == task.groupId) {
+                    setGroup(group);
+                }
+            });
+        }
+    }, [props.groups, task])
 
     useEffect(() => {
         getTaskDetails();
@@ -48,18 +53,6 @@ const Task = (props) => {
         7: 'success'
     }
 
-    const showNetworkModal = () => {
-        if(props.metamask.address === "" || props.metamask.chainId !== '0x3') {
-            props.dispatch({
-                type: CHANGE_NETWORK_MODAL,
-                payload: {showModal: true}
-            });
-            return true;
-        } else {
-            return false
-        }
-    }
-
     return <ListGroup.Item className="p-4">
         {
             task ?
@@ -71,7 +64,7 @@ const Task = (props) => {
                 <p>{task.details}</p>
                 <ul className="list-inline">
                     <li className="list-inline-item me-4">
-                        <Badge>{task.group}</Badge>
+                        <Badge>{taskGroup ? taskGroup.name : ''}</Badge>
                     </li>
                     <li className="list-inline-item me-4">
                         Creator: <b><EtherscanAddressLink address={task.creator} /></b>
@@ -99,8 +92,8 @@ const Task = (props) => {
                     </span>)
                 }
                 {
-                    (task.groupId == props.groupId || task.creator == props.metamask.address) &&
-                    <TaskActions taskId={props.taskId} groupId={props.groupId} task={task} getTaskDetails={getTaskDetails}/>
+                    (taskGroup && taskGroup.members.indexOf(props.metamask.address) !== -1 || task.creator == props.metamask.address) &&
+                    <TaskActions taskId={props.taskId} group={taskGroup} task={task} getTaskDetails={getTaskDetails}/>
                 }
             </>:
             <>

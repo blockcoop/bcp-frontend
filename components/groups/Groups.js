@@ -2,61 +2,41 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Placeholder } from "react-bootstrap";
 import { connect } from "react-redux";
 import coopService from "../../redux/services/coop.service";
+import groupsService from "../../redux/services/groups.service";
+import AssignModerator from "./AssignModerator";
 import CreateGroup from "./CreateGroup";
 import JoinGroup from "./JoinGroup";
 
 const Groups = (props) => {
-    const [groups, setGroups] = useState(null)
-    const [groupId, setGroup] = useState(0)
-
-    const loadGroups = useCallback( async () => {
-        const grps = await coopService.getGroups(props.coopAddress, true, props.metamask.address);
-        setGroups(grps);
-        props.setGroups(grps);
-        grps.forEach(grp => {
-            if(grp.isMember) {
-                setGroup(grp.id);
-                props.setGroupId(grp.id);
-            }
-        });
-    }, [props.coopAddress, props.metamask.address])
-
-    // const loadGroup = async () => {
-    //     const grp = await coopService.getGroups(props.coopAddress, true, props.metamask.address);
-    //     setGroups(grps);
-    // }
-
-    useEffect(() => {
-        loadGroups();
-    }, [])
-
     return (<>
         {
-            groups ? <>
+            props.groups ? <>
                 <h4 className="fw-bold mb-3">
                 Groups {" "}
-                <Badge pill bg="secondary">{groups.length}</Badge>
+                <Badge pill bg="secondary">{props.groups.length}</Badge>
                 {
                     props.coopInitiator == props.metamask.address &&
-                    <CreateGroup coopAddress={props.coopAddress} loadGroups={loadGroups} /> 
+                    <CreateGroup coopAddress={props.coopAddress} loadGroups={props.loadGroups} /> 
                 }
             </h4>
             <ul className="list-unstyled list-details">
                 {
-                    groups.map((group, i) => {
+                    props.groups.map((group, i) => {
                         return (<li key={i}>
                             <span>
-                                {group.name} <Badge pill bg="secondary">{group.size}</Badge>
+                                {group.name} <Badge pill bg="secondary">{group.members.length}</Badge>
                             </span>
                             {
-                                groupId !== 0 ?
-                                <>
-                                {
-                                    groupId == group.id &&
-                                    <Badge pill bg="success" style={{paddingTop: '0.4rem'}}>Member</Badge>
-                                }
-                                </> :
-                                <JoinGroup coopAddress={props.coopAddress} coopMembershipFee={props.coopMembershipFee} groupId={group.id} loadGroups={loadGroups} />
+                                props.coopInitiator == props.metamask.address && group.members.length > group.moderators.length &&
+                                <AssignModerator coopAddress={props.coopAddress} group={group} loadGroups={props.loadGroups} />
+                            }
+                            {
+                                group.members.indexOf(props.metamask.address) !== -1 ?
+                                <Badge pill bg="success" style={{paddingTop: '0.4rem'}}>Member</Badge> :
+                                <>{
+                                    props.isCoopMember && <JoinGroup coopAddress={props.coopAddress} groupId={group.id} loadGroups={props.loadGroups} />
+                                }</>
+                                
                             }
                             
                         </li>)

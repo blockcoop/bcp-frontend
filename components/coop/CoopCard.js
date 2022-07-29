@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Card, ListGroup, ListGroupItem, Placeholder } from "react-bootstrap";
 import { FaExternalLinkAlt, FaUser } from "react-icons/fa";
 import { connect } from "react-redux";
-import coopService from "../redux/services/coop.service";
+import coopService from "../../redux/services/coop.service";
 
 const CoopCard = (props) => {
     const [coop, setCoop] = useState(null)

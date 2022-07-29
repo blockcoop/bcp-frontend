@@ -24,15 +24,25 @@ const Tasks = (props) => {
             <>
                 <h4 className="fw-bold mb-3">Tasks <Badge pill bg="secondary">
                     {taskIds.length}</Badge> {" "}
-                    <CreateTask coopAddress={props.coopAddress} groupId={props.groupId} loadTasks={loadTasks} />
+                    {
+                        props.groups !== null && props.isCoopMember &&
+                        <CreateTask coopAddress={props.coopAddress} groups={props.groups} loadTasks={loadTasks} />
+                    }
                 </h4>
                 {
-                    taskIds.length > 0 ?
-                    <ListGroup>
-                        { taskIds.slice().reverse().map(taskId => <Task key={taskId} taskId={taskId} groupId={props.groupId} groups={props.groups} />) }
-                    </ListGroup> :
-                    <h5>No Tasks</h5>
+                    props.isCoopMember ?
+                    <>
+                        {
+                            taskIds.length > 0 ?
+                            <ListGroup>
+                                { taskIds.slice().reverse().map(taskId => <Task key={taskId} taskId={taskId} groups={props.groups} />) }
+                            </ListGroup> :
+                            <h5>No Tasks</h5>
+                        }
+                    </> :
+                    <h5 className="text-primary">Only BlockCOOP members can view Tasks</h5>
                 }
+                
                 
             </> :
             <>

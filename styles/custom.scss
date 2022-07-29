@@ -88,6 +88,59 @@ select option:hover {
         border-bottom: 1px solid #e5e7eb;
         display: flex;
         justify-content: space-between;
+        align-items: flex-end;
         padding: 10px 0;
     }
+}
+
+.sidebar {
+    .nav-link {
+        font-size: 18px;
+        padding: 1rem;
+        color: #6c757d;
+        &:hover {
+            color: rgba(0, 0, 0, 0.7);
+        }
+        &.active {
+            color: $primary;
+        }
+        &:first-child {
+            padding-top: 0px;
+        }
+        
+        svg {
+            margin-right: 8px;
+        }
+    }
+}
+
+.coop-nft-card {
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: 
+    linear-gradient(#FFFFFF 0 0) padding-box, /*this is your grey background*/
+    linear-gradient(270deg, #EA7715 0%, #EB3933 52%, #F28585 100%) border-box;
+}
+
+.btn-color {
+    background: linear-gradient(#fff 0 0) padding-box,linear-gradient(270deg, #EA7715 0%, #EB3933 52%, #F28585 100%) border-box;;
+    border: 2px solid transparent;
+    display: inline-block;
+    text-transform: uppercase;
+    font-weight: 700;
+
+    &:hover {
+        color: #fff!important;
+        background: linear-gradient(270deg,#EA7715 0%, #EB3933 52%, #F28585 100%) border-box;
+    }
+}
+
+.member-circle {
+    margin: 0 auto;
+    width: 200px;
+    height: 200px;
+    background-color: #D8D8D8;
+    border: 1px solid #979797;
+    border-radius: 100px;
+    line-height: 195px;
 }

@@ -2,7 +2,7 @@ import { connect } from "react-redux";
 import { Card, Col, Container, Placeholder, Row } from "react-bootstrap"
 import { useEffect, useState } from "react";
 import coopService from "../redux/services/coop.service";
-import CoopCard from "../components/CoopCard";
+import CoopCard from "../components/coop/CoopCard";
 
 const ViewCoops = (props) => {
 

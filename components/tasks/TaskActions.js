@@ -14,6 +14,8 @@ const TaskActions = (props) => {
     const [taskCompletionVoting, setTaskCompletionVoting] = useState(false)
     const [processTask, setProcessTask] = useState(false)
     const [contractListner, setContractListner] = useState([])
+    const [isVoted, setIsVoted] = useState(false)
+    const [isTaskCompletionVoted, setIsTaskCompletionVoted] = useState(false)
 
     let currentTime = new Date().getTime() / 1000;
 
@@ -93,7 +95,7 @@ const TaskActions = (props) => {
         });
     }
 
-    const handleProcessTask = (isCompleted) => {
+    const handleProcessTask = () => {
         if(showNetworkModal()) {
             return;
         }
@@ -111,6 +113,10 @@ const TaskActions = (props) => {
             setProcessTask(false);
         });
     }
+
+    useEffect(() => {
+        
+    }, [props.task, props.group])
 
     useEffect(() => {
         if(!contractListner.includes(props.metamask.address)) {
@@ -219,7 +225,7 @@ const TaskActions = (props) => {
     return (
         <ul className="list-inline mb-0">
         {
-            props.groupId == props.task.groupId &&
+            props.group && props.group.members.indexOf(props.metamask.address) !== -1 &&
             <>
             {
                 props.task.votingDeadline > currentTime &&
@@ -244,6 +250,12 @@ const TaskActions = (props) => {
                     }
                 </li>
             }
+            
+            </>
+        }
+        {
+            props.group && props.group.moderators && props.group.moderators.indexOf(props.metamask.address) !== -1 &&
+            <>
             {
                 (props.task.votingDeadline > currentTime && props.taskStatus == '5' ) &&
                 <li className="list-inline-item me-3 mt-3">

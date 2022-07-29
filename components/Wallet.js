@@ -73,7 +73,7 @@ const Wallet = (props) => {
                         title={"Connected: "+shortAddress}
                     >
                         <Dropdown.Item href={"https://ropsten.etherscan.io/address/"+props.metamask.address} target="_blank" className="fw-bold">
-                            {shortAddress} {" "} <FaExternalLinkAlt />
+                            {shortAddress} {" "} <small className="ms-2"><FaExternalLinkAlt /></small>
                         </Dropdown.Item>
                     </DropdownButton>
                 </> :

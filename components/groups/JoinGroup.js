@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
-import { joinGroup } from "../../redux/actions/coop.actions";
-import coopService from "../../redux/services/coop.service";
+import { joinGroup } from "../../redux/actions/groups.actions";
+import { groupsContract } from "../../redux/services/groups.service";
 import { CHANGE_NETWORK_MODAL } from "../../redux/types";
 
 const JoinGroup = (props) => {
@@ -16,7 +16,7 @@ const JoinGroup = (props) => {
         }
         setJoining(true);
         props.dispatch(
-            joinGroup(props.metamask.address, props.coopAddress, props.groupId, props.coopMembershipFee)
+            joinGroup(props.metamask.address, props.coopAddress, props.groupId)
         )
         .then((response) => {
             if(response !== 200) {
@@ -44,15 +44,14 @@ const JoinGroup = (props) => {
         if(!contractListner.includes(props.metamask.address) && props.coopAddress) {
             contractListner.push(props.metamask.address)
             setContractListner(contractListner)
-            const coopContract = coopService.getCoopContract(props.coopAddress)
-            coopContract.events.CoopJoined({
+            groupsContract.events.GroupJoined({
                 filter: {member: props.metamask.address, groupId: props.groupId}
             }, (error, data) => {
                 if(error) {
-                    toast.error("Problem with joining the COOP.")
+                    toast.error("Problem with joining the Group.")
                     setJoining(false);
                 } else {
-                    toast.success("COOP joined successfully.")
+                    toast.success("Group joined successfully.")
                     props.loadGroups();
                     setJoining(false);
                 }

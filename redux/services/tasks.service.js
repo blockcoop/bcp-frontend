@@ -3,7 +3,7 @@ const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
 const contractTasksABI = require("../../abis/tasks-abi.json");
-export const tasksContractAddress = "0xeC1B3dC4347B6aA4068332AAa53af70Cc8eAAc9F";
+export const tasksContractAddress = "0x3Ac7082d71F779d08e661Beb283C1cCDE2812919";
 
 export const taskContract = new web3.eth.Contract(
     contractTasksABI, tasksContractAddress

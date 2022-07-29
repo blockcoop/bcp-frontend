@@ -9,6 +9,7 @@ import { CHANGE_NETWORK_MODAL } from "../../redux/types";
 const CreateTask = (props) => {
     const [show, setShow] = useState(false)
     const [details, setDetails] = useState("")
+    const [groupId, setGroupId] = useState("")
     const [taskDeadline, setTaskDeadline] = useState("")
     const [votingDeadline, setVotingDeadline] = useState("")
     const [isCreating, setIsCreating] = useState(false)
@@ -18,7 +19,7 @@ const CreateTask = (props) => {
         if(showNetworkModal()) {
             return;
         }
-        if(details === '' || taskDeadline === '' || votingDeadline === '') {
+        if(details === '' || taskDeadline === '' || votingDeadline === '' || groupId === "") {
             toast.error("All fields compulsory", {
                 position: toast.POSITION.BOTTOM_CENTER
             })
@@ -41,7 +42,7 @@ const CreateTask = (props) => {
         }
         setIsCreating(true)
         props.dispatch(
-            createTask(props.metamask.address, props.coopAddress, props.groupId, details, votingDeadlineTime, taskDeadlineTime)
+            createTask(props.metamask.address, props.coopAddress, groupId, details, votingDeadlineTime, taskDeadlineTime)
         )
         .then((response) => {
             console.log(response)
@@ -84,6 +85,10 @@ const CreateTask = (props) => {
                     props.loadTasks();
                     setIsCreating(false);
                     setShow(false)
+                    setDetails("");
+                    setGroupId("");
+                    setVotingDeadline("");
+                    setTaskDeadline("");
                 }
             });
         }
@@ -105,6 +110,17 @@ const CreateTask = (props) => {
             </Modal.Header>
             <Modal.Body>
                 <Form>
+                    <Form.Group className="mb-3" controlId="groupId">
+                        <Form.Label>Group</Form.Label>
+                        <Form.Select onChange={(e) => setGroupId(e.target.value)}>
+                            <option value="">Select Group</option>
+                            {
+                                props.groups.map(group => (
+                                    <option key={group.id} value={group.id}>{group.name}</option>
+                                ))
+                            }
+                        </Form.Select>
+                    </Form.Group>
                     <Form.Group className="mb-3" controlId="details">
                         <Form.Label>Task Details</Form.Label>
                         <Form.Control as="textarea" rows="3" value={details} onChange={(e) => setDetails(e.target.value)} />

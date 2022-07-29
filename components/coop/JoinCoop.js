@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
-import { joinCoop } from "../redux/actions/coop.actions";
-import coopService from "../redux/services/coop.service";
-import { CHANGE_NETWORK_MODAL } from "../redux/types";
+import { joinCoop } from "../../redux/actions/coop.actions";
+import coopService from "../../redux/services/coop.service";
+import { CHANGE_NETWORK_MODAL } from "../../redux/types";
 
 const JoinCoop = (props) => {
     const [joining, setJoining] = useState(false)
@@ -53,7 +53,7 @@ const JoinCoop = (props) => {
                     setJoining(false);
                 } else {
                     toast.success("COOP joined successfully.")
-                    props.loadCoopDetails();
+                    props.loadCoopMembership();
                     setJoining(false);
                 }
             });
@@ -63,7 +63,7 @@ const JoinCoop = (props) => {
     return <>
         {
             ! props.coop.members.includes(props.metamask.address) &&
-            <div className="text-center">
+            <div className="mt-5">
                 {
                     joining ?
                     <Button disabled>Joining COOP <Spinner animation="border" size="sm" /></Button> :
