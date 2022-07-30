@@ -4,12 +4,10 @@ import { Card, ListGroup, ListGroupItem, Placeholder } from "react-bootstrap";
 import { FaExternalLinkAlt, FaUser } from "react-icons/fa";
 import { connect } from "react-redux";
 import coopService from "../../redux/services/coop.service";
-import { EtherscanAddressLink } from "../EtherscanAddressLink";
+import EtherscanAddressLink from "../EtherscanAddressLink";
 
 const CoopCard = (props) => {
     const [coop, setCoop] = useState(null)
-
-    
 
     useEffect(() => {
         coopService.getCoopDetails(props.coopAddress).then((coopDetails) => {
@@ -21,8 +19,7 @@ const CoopCard = (props) => {
         {
             coop ? 
             <Link href={`/coop/${props.coopAddress}`}>
-                <a>
-                <Card.Body style={{width: '100%'}}>
+                <Card.Body style={{width: '100%', cursor: 'pointer'}}>
                     <Card.Title className="fw-bold">{coop.name} {""} <small className="text-muted">({coop.symbol})</small></Card.Title>
                     <div className="mb-3 mt-3">
                         <FaUser />{" "}
@@ -39,7 +36,6 @@ const CoopCard = (props) => {
                         </li>
                     </ul>
                 </Card.Body>
-                </a>
             </Link> :
             <Card.Body style={{width: '100%'}}>
                 <Placeholder as={Card.Title} animation="glow">
