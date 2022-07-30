@@ -33,12 +33,12 @@ class MetaMaskService {
 
     async changeNetwork() {
         if (window.ethereum) {
-            const chainId = '3';
+            const chainId = '4';
             if (window.ethereum.networkVersion !== chainId) {
                 try {
                     await window.ethereum.request({
                         method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x3' }]
+                        params: [{ chainId: '0x4' }]
                     });
                     const addressArray = await window.ethereum.request({
                         method: "eth_requestAccounts",

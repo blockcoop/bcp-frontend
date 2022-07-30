@@ -67,12 +67,12 @@ const Wallet = (props) => {
             props.metamask.address !== "" ? 
             <>
             {
-                props.metamask.chainId === '0x3' ?
+                props.metamask.chainId === '0x4' ?
                 <>
                     <DropdownButton id="dropdown-item-button" align="end"
                         title={"Connected: "+shortAddress}
                     >
-                        <Dropdown.Item href={"https://ropsten.etherscan.io/address/"+props.metamask.address} target="_blank" className="fw-bold">
+                        <Dropdown.Item href={"https://rinkeby.etherscan.io/address/"+props.metamask.address} target="_blank" className="fw-bold">
                             {shortAddress} {" "} <small className="ms-2"><FaExternalLinkAlt /></small>
                         </Dropdown.Item>
                     </DropdownButton>
@@ -80,7 +80,7 @@ const Wallet = (props) => {
                 <>
                     <OverlayTrigger
                         placement="bottom"
-                        overlay={<Tooltip>Connect to Ropsten Testnet</Tooltip>}
+                        overlay={<Tooltip>Connect to Rinkeby Testnet</Tooltip>}
                     >
                         <span className="p-2 bg-danger rounded-pill text-light">
                             <FaUnlink /> { " " }

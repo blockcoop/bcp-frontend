@@ -3,7 +3,7 @@ const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
 const web3 = createAlchemyWeb3(alchemyKey);
 
 const contractTasksABI = require("../../abis/tasks-abi.json");
-export const tasksContractAddress = "0x3Ac7082d71F779d08e661Beb283C1cCDE2812919";
+export const tasksContractAddress = "0x2C48A17E43c72b17941f817ae62D5bF30d1C5F15";
 
 export const taskContract = new web3.eth.Contract(
     contractTasksABI, tasksContractAddress
@@ -94,6 +94,14 @@ class TaskService {
         const data = taskContract.methods.processTaskCompletion(taskId).encodeABI();
         const response = await this.sendTransaction(address, tasksContractAddress, data, value);
         return response;
+    }
+
+    async isVoted(address, taskId) {
+        return await taskContract.methods.isVoted(taskId).call({from: address});
+    }
+
+    async isTaskCompletionVoted(address, taskId) {
+        return await taskContract.methods.isTaskCompletionVoted(taskId).call({from: address});
     }
 
     async sendTransaction(address, contractAddress, data, value) {

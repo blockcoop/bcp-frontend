@@ -84,7 +84,7 @@ const Task = (props) => {
                     <span className="me-4" key={i} >
                         {
                             participant === props.metamask.address ?
-                            <a href={"https://ropsten.etherscan.io/address/"+participant} target="_blank" rel="noreferrer">
+                            <a href={"https://rinkeby.etherscan.io/address/"+participant} target="_blank" rel="noreferrer">
                                 You
                             </a> :
                             <EtherscanAddressLink address={participant} />

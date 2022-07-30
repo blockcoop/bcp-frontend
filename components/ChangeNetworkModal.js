@@ -16,8 +16,8 @@ const ChangeNetworkModal = (props) => {
         )
         .then((response) => {
             setPending(false);
-            if(response.chainId === '0x3') {
-                toast.success("Network changed to Ropsten.")
+            if(response.chainId === '0x4') {
+                toast.success("Network changed to Rinkeby.")
             } else {
                 toast.error("User cancelled network change request.")
             }
@@ -81,7 +81,7 @@ const ChangeNetworkModal = (props) => {
                         }
                     </> :
                     <>
-                        <h4 className="mb-4 mt-4">You are on wrong network. Please change network to Ropsten to complete the transaction.</h4>
+                        <h4 className="mb-4 mt-4">You are on wrong network. Please change network to Rinkeby to complete the transaction.</h4>
                         {
                             pending ?
                             <Button disabled>Changing Network <Spinner animation="border" size="sm" /></Button> :

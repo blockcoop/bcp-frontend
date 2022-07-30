@@ -4,6 +4,7 @@ import { Card, ListGroup, ListGroupItem, Placeholder } from "react-bootstrap";
 import { FaExternalLinkAlt, FaUser } from "react-icons/fa";
 import { connect } from "react-redux";
 import coopService from "../../redux/services/coop.service";
+import { EtherscanAddressLink } from "../EtherscanAddressLink";
 
 const CoopCard = (props) => {
     const [coop, setCoop] = useState(null)
@@ -25,9 +26,7 @@ const CoopCard = (props) => {
                     <Card.Title className="fw-bold">{coop.name} {""} <small className="text-muted">({coop.symbol})</small></Card.Title>
                     <div className="mb-3 mt-3">
                         <FaUser />{" "}
-                        <a href={`https://ropsten.etherscan.io/address/${coop.coopInitiator}`} target="_blank" rel="noreferrer">
-                            {String(coop.coopInitiator).substring(0, 6) + "..." + String(coop.coopInitiator).substring(38)} {" "}
-                        </a>
+                        <EtherscanAddressLink address={coop.coopInitiator} showIcon={true} />
                     </div>
                     <ul className="list-unstyled list-details">
                         <li>

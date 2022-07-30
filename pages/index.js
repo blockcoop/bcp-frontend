@@ -115,7 +115,7 @@ const CreateCoop = (props) => {
     }, [register, countries.length])
 
     const showNetworkModal = () => {
-        if(props.metamask.address === "" || props.metamask.chainId !== '0x3') {
+        if(props.metamask.address === "" || props.metamask.chainId !== '0x4') {
             props.dispatch({
                 type: CHANGE_NETWORK_MODAL,
                 payload: {showModal: true}

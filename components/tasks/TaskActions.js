@@ -4,7 +4,7 @@ import { FaThumbsDown, FaThumbsUp } from "react-icons/fa";
 import { connect } from "react-redux";
 import { toast } from "react-toastify";
 import { participate, processTaskCompletion, processTaskVoting, taskCompletionVote, vote } from "../../redux/actions/tasks.actions";
-import { taskContract } from "../../redux/services/tasks.service";
+import tasksService, { taskContract } from "../../redux/services/tasks.service";
 import { CHANGE_NETWORK_MODAL } from "../../redux/types";
 
 const TaskActions = (props) => {
@@ -115,7 +115,19 @@ const TaskActions = (props) => {
     }
 
     useEffect(() => {
-        
+        if(props.group && props.task) {
+            if(props.group.members.indexOf(props.metamask.address) !== -1 && props.task.votingDeadline > currentTime) {
+                tasksService.isVoted(props.metamask.address, props.taskId).then((voted) => {
+                    setIsVoted(voted)
+                })
+            }
+
+            if(props.group.moderators.indexOf(props.metamask.address) !== -1 && (props.task.taskDeadline + 604800) > currentTime && props.taskStatus == '5') {
+                tasksService.isTaskCompletionVoted(props.metamask.address, props.taskId).then((voted) => {
+                    setIsTaskCompletionVoted(voted)
+                })
+            }
+        }
     }, [props.task, props.group])
 
     useEffect(() => {
@@ -211,7 +223,7 @@ const TaskActions = (props) => {
     )
 
     const showNetworkModal = () => {
-        if(props.metamask.address === "" || props.metamask.chainId !== '0x3') {
+        if(props.metamask.address === "" || props.metamask.chainId !== '0x4') {
             props.dispatch({
                 type: CHANGE_NETWORK_MODAL,
                 payload: {showModal: true}
@@ -231,13 +243,18 @@ const TaskActions = (props) => {
                 props.task.votingDeadline > currentTime &&
                 <li className="list-inline-item me-3 mt-3">
                     {
-                        voting ?
-                        <Button disabled>Voting <Spinner animation="border" size="sm" /></Button> :
-                        <OverlayTrigger trigger="click" placement="top" overlay={voteComponent}>
-                            <Button>Vote</Button>
-                        </OverlayTrigger>
+                        isVoted ?
+                        <p className="text-success">Voted for Task</p> :
+                        <>
+                        {
+                            voting ?
+                            <Button disabled>Voting <Spinner animation="border" size="sm" /></Button> :
+                            <OverlayTrigger trigger="click" placement="top" overlay={voteComponent}>
+                                <Button>Vote</Button>
+                            </OverlayTrigger>
+                        }
+                        </>
                     }
-                    
                 </li>
             }
             {
@@ -257,16 +274,21 @@ const TaskActions = (props) => {
             props.group && props.group.moderators && props.group.moderators.indexOf(props.metamask.address) !== -1 &&
             <>
             {
-                (props.task.votingDeadline > currentTime && props.taskStatus == '5' ) &&
+                ((props.task.taskDeadline + 604800) > currentTime && props.taskStatus == '5' ) &&
                 <li className="list-inline-item me-3 mt-3">
                     {
-                        taskCompletionVoting ?
-                        <Button disabled>Task Completion Voting <Spinner animation="border" size="sm" /></Button> :
-                        <OverlayTrigger trigger="click" placement="top" overlay={taskCompletionVoteComponent}>
-                            <Button>Task Completion Vote</Button>
-                        </OverlayTrigger>
+                        isTaskCompletionVoted ?
+                        <p className="text-success">Voted for Completion</p> :
+                        <>
+                        {
+                            taskCompletionVoting ?
+                            <Button disabled>Task Completion Voting <Spinner animation="border" size="sm" /></Button> :
+                            <OverlayTrigger trigger="click" placement="top" overlay={taskCompletionVoteComponent}>
+                                <Button>Task Completion Vote</Button>
+                            </OverlayTrigger>
+                        }
+                        </>
                     }
-                    
                 </li>
             }
             </>

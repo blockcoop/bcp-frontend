@@ -60,7 +60,7 @@ class TransactionModal extends Component {
                     }
                     {
                         transaction.code === 200 &&
-                        <Link href={`https://ropsten.etherscan.io/tx/${transaction.address}`}>
+                        <Link href={`https://rinkeby.etherscan.io/tx/${transaction.address}`}>
                             <a className="btn btn-primary active" target="_blank" style={{marginRight: "15px"}}>View TXN</a>
                         </Link>
                         

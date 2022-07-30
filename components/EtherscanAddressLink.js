@@ -2,7 +2,7 @@ import { FaExternalLinkAlt } from 'react-icons/fa';
 import metamaskService from '../redux/services/metamask.service';
 
 const EtherscanAddressLink = ({address, showIcon}) => {
-    return <a href={"https://ropsten.etherscan.io/address/"+address} target="_blank" rel="noreferrer">
+    return <a href={"https://rinkeby.etherscan.io/address/"+address} target="_blank" rel="noreferrer">
         { metamaskService.getShortAddress(address) }
         {
             showIcon &&
